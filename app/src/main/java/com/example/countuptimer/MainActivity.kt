@@ -48,7 +48,6 @@ fun CountUpTimerApp() {
     var isStreakMode by remember { mutableStateOf(prefs.getBoolean("isStreakMode", true)) }
     var labelAbove by remember { mutableStateOf(prefs.getBoolean("labelAbove", true)) }
     
-    // Checkbox states
     var showModeLabel by remember { mutableStateOf(prefs.getBoolean("showModeLabel", true)) }
     var isTransparent by remember { mutableStateOf(prefs.getBoolean("isTransparent", false)) }
 
@@ -60,7 +59,6 @@ fun CountUpTimerApp() {
     val daysElapsed = todayEpoch - startDateEpoch
     val displayValue = if (isStreakMode) daysElapsed + 1 else daysElapsed
     val modeText = if (isStreakMode) "Days In Streak" else "Days Elapsed"
-    val activeBgColor = if (isTransparent) Color.Transparent else bgColor
 
     val updateWidgets = {
         val intent = Intent(context, CountUpWidget::class.java).apply {
@@ -100,7 +98,7 @@ fun CountUpTimerApp() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(activeBgColor)
+            .background(bgColor)
             .verticalScroll(rememberScrollState())
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -140,7 +138,7 @@ fun CountUpTimerApp() {
                 }
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(checked = isTransparent, onCheckedChange = { isTransparent = it }, colors = CheckboxDefaults.colors(checkedColor = Color.White, uncheckedColor = Color.LightGray))
-                    Text("Transparent Background", color = Color.White)
+                    Text("Transparent Widget Background", color = Color.White)
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
