@@ -48,8 +48,9 @@ fun CountUpTimerApp() {
     var isStreakMode by remember { mutableStateOf(prefs.getBoolean("isStreakMode", true)) }
     var labelAbove by remember { mutableStateOf(prefs.getBoolean("labelAbove", true)) }
     
-    // Checkbox state for Mode Label
+    // Checkbox states
     var showModeLabel by remember { mutableStateOf(prefs.getBoolean("showModeLabel", true)) }
+    var isTransparent by remember { mutableStateOf(prefs.getBoolean("isTransparent", false)) }
 
     var bgColor by remember { mutableStateOf(Color(prefs.getInt("bgColor", Color.Black.toArgb()))) }
     var fgColor by remember { mutableStateOf(Color(prefs.getInt("fgColor", Color.White.toArgb()))) }
@@ -59,6 +60,7 @@ fun CountUpTimerApp() {
     val daysElapsed = todayEpoch - startDateEpoch
     val displayValue = if (isStreakMode) daysElapsed + 1 else daysElapsed
     val modeText = if (isStreakMode) "Days In Streak" else "Days Elapsed"
+    val activeBgColor = if (isTransparent) Color.Transparent else bgColor
 
     val updateWidgets = {
         val intent = Intent(context, CountUpWidget::class.java).apply {
@@ -69,13 +71,14 @@ fun CountUpTimerApp() {
         context.sendBroadcast(intent)
     }
 
-    LaunchedEffect(startDateEpoch, labelText, isStreakMode, labelAbove, showModeLabel, bgColor, fgColor, labelColor) {
+    LaunchedEffect(startDateEpoch, labelText, isStreakMode, labelAbove, showModeLabel, isTransparent, bgColor, fgColor, labelColor) {
         prefs.edit()
             .putLong("startDate", startDateEpoch)
             .putString("label", labelText)
             .putBoolean("isStreakMode", isStreakMode)
             .putBoolean("labelAbove", labelAbove)
             .putBoolean("showModeLabel", showModeLabel)
+            .putBoolean("isTransparent", isTransparent)
             .putInt("bgColor", bgColor.toArgb())
             .putInt("fgColor", fgColor.toArgb())
             .putInt("labelColor", labelColor.toArgb())
@@ -97,7 +100,7 @@ fun CountUpTimerApp() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(bgColor)
+            .background(activeBgColor)
             .verticalScroll(rememberScrollState())
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -134,6 +137,10 @@ fun CountUpTimerApp() {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(checked = showModeLabel, onCheckedChange = { showModeLabel = it }, colors = CheckboxDefaults.colors(checkedColor = Color.White, uncheckedColor = Color.LightGray))
                     Text("Show Mode Label", color = Color.White)
+                }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(checked = isTransparent, onCheckedChange = { isTransparent = it }, colors = CheckboxDefaults.colors(checkedColor = Color.White, uncheckedColor = Color.LightGray))
+                    Text("Transparent Background", color = Color.White)
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -183,13 +190,17 @@ fun CountUpTimerApp() {
 
 @Composable
 fun ColorPickerRow(title: String, currentColor: Color, onColorSelected: (Color) -> Unit) {
-    val presetColors = listOf(Color.Black, Color.White, Color.DarkGray, Color.Blue, Color(0xFF4CAF50), Color.Red, Color(0xFF9C27B0))
+    val presetColors = listOf(
+        Color.Black, Color.White, Color.DarkGray, Color.Gray, Color.LightGray,
+        Color.Blue, Color.Cyan, Color.Red, Color.Magenta, Color.Yellow,
+        Color.Green, Color(0xFF4CAF50), Color(0xFF009688), Color(0xFFE91E63), Color(0xFFFF9800)
+    )
     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(vertical = 8.dp)) {
         Text("$title: ", color = Color.White, modifier = Modifier.width(100.dp))
         presetColors.forEach { color ->
             Box(
                 modifier = Modifier
-                    .size(32.dp)
+                    .size(28.dp)
                     .padding(2.dp)
                     .background(color, CircleShape)
                     .border(
