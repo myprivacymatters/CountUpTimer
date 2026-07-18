@@ -1,6 +1,5 @@
 package com.example.countuptimer
 
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import android.app.Activity
 import android.app.DatePickerDialog
 import android.appwidget.AppWidgetManager
@@ -38,6 +37,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CountUpTimerApp() {
     val context = LocalContext.current
